@@ -17,23 +17,31 @@ To install, you will need a Ruby interpreter.
 
 You can try the samples by typing:
 
-  ruby samples/count.rb samples/royal.ged
-  ruby samples/birthdays.rb samples/royal.ged
+````
+ruby samples/count.rb samples/royal.ged
+ruby samples/birthdays.rb samples/royal.ged
+````
 
 
 Alternately, a C extension version of the date parser can be built. In order to
 build you will need a C compiler (gcc is preferred).
 
-  cd lib/
-  ruby extconf.rb
-  make
-  make install
+````
+cd lib/
+ruby extconf.rb
+make
+make install
+````
 
 And then uncomment the line in gedcom.rb 
-   #require '_gedcom'
+````
+#require '_gedcom'
+````
 
 and comment out
-   require 'gedcom_date'
+````
+require 'gedcom_date'
+````
 
 Usage
 -----
@@ -48,13 +56,16 @@ register callbacks for specified contexts.  A "context" is simply an
 array of strings, where each element of the array specifies a GEDCOM
 row type.  For example:
 
+````
   [ "INDI" ] -> this context defines a row on which an individual is
   introduced.
   [ "INDI", "BIRT", "DATE" ] -> this context defines the birthdate of
   an individual.
+````
 
 Callbacks are registered using a proc, a method name, or a block:
 
+````
   before( context, proc )
   after( context, proc )
 
@@ -63,6 +74,7 @@ Callbacks are registered using a proc, a method name, or a block:
 
   before( context ) do ... end
   after( context ) do ... end
+````
 
 The 'before' handler is called as soon as the context is recognized,
 before anything else is done.  The 'after' handler is called when the
@@ -75,9 +87,11 @@ initialization and commit operations.
 
 Callbacks should take a single parameter, which will be the data portion of each row:
 
+````
   def callbackFunction( data, cookie, parm )
     ...
   end
+````
 
 To parse a file, simply call the parser's 'parse' method, passing the
 name of the file to parse.  The 'parse' method will take a filename,
@@ -86,7 +100,7 @@ or an IO instance.
 
 API Reference
 -------------
-
+````
   module GEDCOM
 
     class Parser
@@ -224,4 +238,4 @@ API Reference
 
       def <=>( date_part )
         :: Compares this date_part with the parameter, and returns -1, 0, or 1.
-
+````
