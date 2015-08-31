@@ -6,19 +6,19 @@
 # modify it under the terms of the GNU Lesser General Public
 # License as published by the Free Software Foundation; either
 # version 2.1 of the License, or (at your option) any later version.
-# 
+#
 # This library is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Lesser General Public
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # -------------------------------------------------------------------------
 
 #require '_gedcom'
-require 'gedcom_date'
+require 'gedcom_ruby/date'
 require 'stringio'
 
 module GEDCOM
@@ -26,7 +26,7 @@ module GEDCOM
 
   # Possibly a better way to do this?
   VERSION = "0.2.1"
-	
+
   class Parser
     def initialize &block
       @before = {}
@@ -71,7 +71,7 @@ module GEDCOM
 
 
     protected
-    
+
     def check_proc_or_block proc, &block
       unless proc or block_given?
         raise ArgumentError.new("proc or block required")
@@ -125,7 +125,7 @@ module GEDCOM
     end
 
     def concat_data tag, rest
-      if @dataStack[-1].nil? 
+      if @dataStack[-1].nil?
         @dataStack[-1] = rest
       else
         if @ctxStack[-1] == 'BLOB'
@@ -189,4 +189,3 @@ module GEDCOM
   end #/ Parser
 
 end #/ GEDCOM
-

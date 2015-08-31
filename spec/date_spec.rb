@@ -1,6 +1,3 @@
-require 'gedcom'
-include GEDCOM
-
 describe Date do
   before(:each) do
     @date = GEDCOM::Date.new("1 APRIL 2008")
@@ -9,33 +6,33 @@ describe Date do
     @date_bc = GEDCOM::Date.new("25 JANUARY 1 BC")
     @date_year_span = GEDCOM::Date.new("1 APRIL 2007/08")
   end
-  
-  ## ! Could definitely stand to beef this test up. About, Estimated, etc. 
+
+  ## ! Could definitely stand to beef this test up. About, Estimated, etc.
   ##   Lot's of flags to test.
   it "makes flags available" do
     (@date_range_from.format & GEDCOM::Date::FROMTO).should_not == 0
     (@date_range_between.format & GEDCOM::Date::BETWEEN).should_not == 0
   end
-  
+
   it "does comparison" do
     (@date <=> @date_bc).should == 1
     (@date_bc <=> @date).should == -1
     (@date <=> @date).should == 0
   end
-  
+
   it "gets first and last date from ranges" do
     @date_range_from.is_range?.should == true
     @date_range_between.is_range?.should == true
-    
+
     @date_range_from.first.nil?.should == false
     @date_range_from.last.nil?.should == false
     @date_range_between.first.nil?.should == false
     @date_range_between.last.nil?.should == false
-    
+
     (@date_range_from.first <=> @date_range_from.last).should == -1
     (@date_range_between.first <=> @date_range_between.last).should == -1
   end
-  
+
   # to_s currently works differently in the Ruby vs. C extension
   # code, therefore this test is failing (in C)
   it "converts to string" do

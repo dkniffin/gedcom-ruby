@@ -17,11 +17,11 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # -------------------------------------------------------------------------
 #
-require 'gedcom_date_parser'
+require 'gedcom_ruby/date_parser'
 module GEDCOM
 
     class DatePart < GEDCOM_DATE_PARSER::GEDDate
-      
+
       # Flags
       NONE = GEDCOM_DATE_PARSER::GFNONE
       PHRASE = GEDCOM_DATE_PARSER::GFPHRASE
@@ -31,102 +31,102 @@ module GEDCOM
       NOMONTH = GEDCOM_DATE_PARSER::GFNOMONTH
       NOYEAR = GEDCOM_DATE_PARSER::GFNOYEAR
       YEARSPAN = GEDCOM_DATE_PARSER::GFYEARSPAN
-      
+
       def initialize(type=GEDCOM_DATE_PARSER::GCTGREGORIAN, flags=NONE, data=nil)
         super( type, flags, data )
       end
-      
+
       def calendar
         @type
       end
-      
+
       def compliance
         @flags
       end
-      
+
       def phrase
         raise DateFormatException if( @flags != PHRASE )
         @data
       end
-      
+
       def has_day?
         return false if ( @flags == PHRASE )
         return ((@data.flags & NODAY) != 0 ? false : true)
       end
-      
+
       def has_month?
         return false if ( @flags == PHRASE )
         return ((@data.flags & NOMONTH) != 0 ? false : true)
       end
-        
+
       def has_year?
         return false if ( @flags == PHRASE )
         return ((@data.flags & NOYEAR) != 0 ? false : true)
       end
-      
+
       def has_year_span?
         return false if ( @flags == PHRASE )
         return ((@data.flags & YEARSPAN) != 0 ? true : false)
       end
-      
+
       def day
         raise DateFormatException, "date has no day" if (@flags == PHRASE || (@data.flags & NODAY) != 0)
         @data.day
       end
-      
+
       def month
         raise DateFormatException, "date has no month" if (@flags == PHRASE || (@data.flags & NOMONTH) != 0)
         @data.month
       end
-      
+
       def year
         raise DateFormatException, "date has no year" if (@flags == PHRASE || (@data.flags & NOYEAR) != 0)
         @data.year
       end
-      
+
       def to_year
         raise DateFormatException, "date has no year span" if (@flags == PHRASE || (@data.flags & YEARSPAN) == 0)
         @data.year2
       end
-      
+
       def epoch
         raise DateFormatException, "only gregorian dates have epoch" if ( @flags == PHRASE || @type != GEDCOM_DATE_PARSER::GCTGREGORIAN )
         return (( @data.adbc == GEDCOM_DATE_PARSER::GEDADBCBC ) ? "BC" : "AD" )
       end
-      
+
       def to_s
         GEDCOM_DATE_PARSER::DateParser.build_gedcom_date_part_string( self )
       end
-      
+
       def <=>( dp )
         return -1 if has_year? and !dp.has_year?
         return 1 if !has_year? and dp.has_year?
-        
+
         if has_year? and dp.has_year?
           rc = ( year <=> dp.year )
           return rc unless rc == 0
         end
-        
+
         return -1 if dp.has_month? and !dp.has_month?
         return 1 if !dp.has_month? and dp.has_month?
-        
+
         if has_month? and dp.has_month?
           rc = ( month <=> dp.month )
           return rc unless rc == 0
         end
-        
+
         return -1 if dp.has_day? and !dp.has_day?
         return 1 if !dp.has_day? and dp.has_day?
-        
+
         if has_day? and dp.has_day?
           rc = ( day <=> dp.day )
           return rc unless rc == 0
         end
-        
+
         return 0
       end
     end #/ DatePart
-    
+
     class Date < GEDCOM_DATE_PARSER::GEDDateValue
       # Calendar types
       NONE = GEDCOM_DATE_PARSER::GCNONE
@@ -173,43 +173,43 @@ module GEDCOM
           end
           err_msg += "'"
           if (block_given?)
-            yield( err_msg ) 
+            yield( err_msg )
           else
             raise DateFormatException, err_msg
           end
         end
       end
-      
+
       def format
         @flags
       end
-      
+
       def first
         @date1
       end
-      
+
       def last
         @date2
       end
-      
+
       def to_s
         GEDCOM_DATE_PARSER::DateParser.build_gedcom_date_string( self )
       end
-      
+
       def is_date?
         (@flags & (NONE | ABOUT | CALCULATED | ESTIMATED | BEFORE | AFTER | BETWEEN \
               | FROM | TO | FROMTO | INTERPRETED)) != 0 ? false : true
       end
-      
+
       def is_range?
         (@flags & (BETWEEN | FROMTO)) != 0 ? true : false
       end
-      
+
       def <=>( d )
         if is_date? and d.is_date?
           rc = ( first <=> d.first )
           return rc unless rc == 0
-          
+
           if is_range? and d.is_range?
             return ( last <=> d.last )
           elsif is_range?
@@ -217,18 +217,18 @@ module GEDCOM
           elsif d.is_range?
             return -1
           end
-          
+
           return 0
         elsif is_date?
           return -1
         elsif d.is_date?
           return 1
         end
-        
+
         return format <=> d.format
       end
     end
-    
+
     class DateType
       GREGORIAN = GEDCOM_DATE_PARSER::GCTGREGORIAN
       JULIAN = GEDCOM_DATE_PARSER::GCTJULIAN
@@ -238,8 +238,8 @@ module GEDCOM
       UNKNOWN = GEDCOM_DATE_PARSER::GCTUNKNOWN
       DEFAULT = GEDCOM_DATE_PARSER::GCTDEFAULT
     end
-    
+
     class DateFormatException < Exception
-      
+
     end
 end
