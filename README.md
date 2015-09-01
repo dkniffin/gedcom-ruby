@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/dkniffin/gedcom-ruby.svg?branch=master)](https://travis-ci.org/dkniffin/gedcom-ruby)
+[![Code Climate](https://codeclimate.com/github/dkniffin/gedcom-ruby/badges/gpa.svg)](https://codeclimate.com/github/dkniffin/gedcom-ruby)
 
 GEDCOM-Ruby
 -----------
