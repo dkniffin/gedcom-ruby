@@ -6,10 +6,10 @@ Gem::Specification.new do |s|
   s.description = "This is a module for the Ruby language that defines a callback GEDCOM parser. It does not do any validation of a GEDCOM file, but, using application-defined callback hooks, can traverse any well-formed GEDCOM."
   s.authors     = ["Derek Kniffin"]
   s.email       = 'derek.kniffin@gmail.com'
-  s.files       = ["lib/gedcom.rb"]
+  s.files       = ["lib/gedcom_ruby.rb"]
   s.homepage    = 'https://github.com/dkniffin/gedcom-ruby'
   s.license     = 'GNU LESSER GENERAL PUBLIC LICENSE'
 
-  s.add_development_dependency "rspec", "~> 3.2.0"
-  s.add_development_dependency "byebug"
+  s.add_development_dependency "rspec", '~> 3.3', '>= 3.3.0'
+  s.add_development_dependency "byebug", '~> 3.3', '>= 3.3.0'
 end

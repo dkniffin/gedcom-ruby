@@ -13,34 +13,14 @@ format).
 Installation
 ------------
 
-To install, you will need a Ruby interpreter. 
+On the command line:
 
-You can try the samples by typing:
-
+````ruby
+gem install gedcom_ruby
 ````
-ruby samples/count.rb samples/royal.ged
-ruby samples/birthdays.rb samples/royal.ged
-````
-
-
-Alternately, a C extension version of the date parser can be built. In order to
-build you will need a C compiler (gcc is preferred).
-
-````
-cd lib/
-ruby extconf.rb
-make
-make install
-````
-
-And then uncomment the line in gedcom.rb 
-````
-#require '_gedcom'
-````
-
-and comment out
-````
-require 'gedcom_date'
+Or add this to your Gemfile
+````ruby
+gem 'gedcom_ruby', '~> 0.3.0'
 ````
 
 Usage
@@ -116,7 +96,7 @@ API Reference
       def after( context, proc=nil, &block )
         :: Registers the given proc or block to be called as soon as
         the given context expires.
-      
+
       def auto_concat= boolean
         :: Sets the auto-concatenation mode (defaults to true/on).
         When auto-concatenation is enabled, any CONT tags in the input
@@ -229,7 +209,7 @@ API Reference
       def to_year
         :: Returns the second year portion of the date, if it has a year span.  If
            it does not contain a year span, a DateFormatException is raised.
-      
+
       def epoch
         :: Returns either "BC" or "AD", as appropriate.
 
