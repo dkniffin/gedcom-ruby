@@ -28,7 +28,7 @@ module GEDCOM
   VERSION = "0.2.1"
 
   class Parser
-    def initialize &block
+    def initialize(&block)
       @before = {}
       @after = {}
       @ctxStack = []
@@ -40,17 +40,17 @@ module GEDCOM
       instance_eval(&block) if block_given?
     end
 
-    def before tag, proc=nil, &block
+    def before(tag, proc=nil, &block)
       proc = check_proc_or_block proc, &block
       @before[[tag].flatten] = proc
     end
 
-    def after tag, proc=nil, &block
+    def after(tag, proc=nil, &block)
       proc = check_proc_or_block proc, &block
       @after[[tag].flatten] = proc
     end
 
-    def parse( file )
+    def parse(file)
       case file
       when String
         if file =~ /\n/mo
@@ -72,7 +72,7 @@ module GEDCOM
 
     protected
 
-    def check_proc_or_block proc, &block
+    def check_proc_or_block(proc, &block)
       unless proc or block_given?
         raise ArgumentError.new("proc or block required")
       end
@@ -115,7 +115,7 @@ module GEDCOM
       unwind_to -1
     end
 
-    def unwind_to level
+    def unwind_to(level)
       while @curlvl >= level
         do_after @ctxStack, @dataStack.last
         @ctxStack.pop
@@ -124,7 +124,7 @@ module GEDCOM
       end
     end
 
-    def concat_data tag, rest
+    def concat_data(tag, rest)
       if @dataStack[-1].nil?
         @dataStack[-1] = rest
       else
@@ -141,7 +141,7 @@ module GEDCOM
       end
     end
 
-    def do_before tag, data
+    def do_before(tag, data)
       if proc = @before[tag]
         proc.call data
       elsif proc = @before[ANY]
@@ -149,7 +149,7 @@ module GEDCOM
       end
     end
 
-    def do_after tag, data
+    def do_after(tag, data)
       if proc = @after[tag]
         proc.call data
       elsif proc = @after[ANY]
@@ -163,7 +163,7 @@ module GEDCOM
     # just in case, also detects simple \n as the separator as well
     # detects the rs for this string by scanning ahead to the first occurence
     # of either \r or \n, and checking the character after it
-    def detect_rs io
+    def detect_rs(io)
       rs = "\x0d"
       mark = io.pos
       begin
