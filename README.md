@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/dkniffin/gedcom-ruby.svg?branch=master)](https://travis-ci.org/dkniffin/gedcom-ruby)
+
 GEDCOM-Ruby
 -----------
 
