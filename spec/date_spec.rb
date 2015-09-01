@@ -1,5 +1,4 @@
 describe Date do
-
   let(:date) { GEDCOM::Date.new("1 APRIL 2008") }
   let(:date_range_from) { GEDCOM::Date.new("FROM APRIL 2007 TO JUNE 2008") }
   let(:date_range_between) { GEDCOM::Date.new("BETWEEN 1 JANUARY 1970 AND 1 APRIL 2008") }
