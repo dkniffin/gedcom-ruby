@@ -28,9 +28,9 @@ module GEDCOM
     def initialize(&block)
       @before = {}
       @after = {}
-      @ctxStack = []
-      @dataStack = []
-      @curlvl = -1
+      @context_stack = []
+      @data_stack = []
+      @current_level = -1
 
       @auto_concat = true
 
@@ -63,7 +63,7 @@ module GEDCOM
     end
 
     def context
-      @ctxStack
+      @context_stack
     end
 
 
@@ -103,36 +103,36 @@ module GEDCOM
 
         tag, rest = rest, tag if tag =~ /@.*@/
 
-        @ctxStack.push tag
-        @dataStack.push rest
-        @curlvl = level
+        @context_stack.push tag
+        @data_stack.push rest
+        @current_level = level
 
-        do_before @ctxStack, rest
+        do_before @context_stack, rest
       end
       unwind_to -1
     end
 
     def unwind_to(level)
-      while @curlvl >= level
-        do_after @ctxStack, @dataStack.last
-        @ctxStack.pop
-        @dataStack.pop
-        @curlvl -= 1
+      while @current_level >= level
+        do_after @context_stack, @data_stack.last
+        @context_stack.pop
+        @data_stack.pop
+        @current_level -= 1
       end
     end
 
     def concat_data(tag, rest)
-      if @dataStack[-1].nil?
-        @dataStack[-1] = rest
+      if @data_stack[-1].nil?
+        @data_stack[-1] = rest
       else
-        if @ctxStack[-1] == 'BLOB'
-          @dataStack[-1] << rest
+        if @context_stack[-1] == 'BLOB'
+          @data_stack[-1] << rest
         else
           if tag == 'CONT'
-            @dataStack[-1] << "\n" + (rest || "")
+            @data_stack[-1] << "\n" + (rest || "")
           elsif tag == 'CONC'
-            old = @dataStack[-1].chomp
-            @dataStack[-1] = old + (rest || "")
+            old = @data_stack[-1].chomp
+            @data_stack[-1] = old + (rest || "")
           end
         end
       end
