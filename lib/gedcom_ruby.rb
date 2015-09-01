@@ -23,6 +23,7 @@ require 'stringio'
 
 module GEDCOM
   attr_accessor :auto_concat
+  attr_reader :callbacks
   ANY = [:any]
 
   class Parser

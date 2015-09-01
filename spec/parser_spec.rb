@@ -5,6 +5,8 @@ describe Parser do
   let(:parser) { GEDCOM::Parser.new }
   let(:tag_count) { {:all => 0} }
 
+  let(:cb_lambda) { lambda{|data| 1 + 1} }
+
   before(:each) do
     parser.before :any do |data|
       tag = parser.context.join('_')
@@ -14,25 +16,46 @@ describe Parser do
     end
   end
 
-  it "can be initialized with block" do
-    parser = GEDCOM::Parser.new do
-      before 'INDI' do
+  describe ".new" do
+    it "can be called with block" do
+      parser = GEDCOM::Parser.new do
+        before 'INDI' do
+        end
       end
     end
   end
 
-  it "can count individual tags, before and after" do
-    count_before = 0
-    count_after = 0
-    parser.before 'INDI' do |data|
-      count_before += 1
+
+  describe "#before" do
+    before { parser.before(:any, &cb_lambda) }
+
+    it "adds a callback to the :before stack" do
+      expect(parser.callbacks[:before]).to include(&cb_lambda)
     end
-    parser.after 'INDI' do |data|
-      count_after += 1
+  end
+
+  describe "#after" do
+    before { parser.after(:any, &cb_lambda) }
+
+    it "adds a callback to the :before stack" do
+      expect(parser.callbacks[:after]).to include(&cb_lambda)
     end
-    parser.parse SIMPLE
-    expect(count_before).to eq(3)
-    expect(count_after).to eq(3)
+  end
+
+  describe "#parse" do
+    it "can count individual tags, before and after" do
+      count_before = 0
+      count_after = 0
+      parser.before 'INDI' do |data|
+        count_before += 1
+      end
+      parser.after 'INDI' do |data|
+        count_after += 1
+      end
+      parser.parse SIMPLE
+      expect(count_before).to eq(3)
+      expect(count_after).to eq(3)
+    end
   end
 
   it "auto-concatenates text" do
