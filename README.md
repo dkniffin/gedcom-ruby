@@ -222,3 +222,9 @@ API Reference
       def <=>( date_part )
         :: Compares this date_part with the parameter, and returns -1, 0, or 1.
 ````
+
+Feedback & Contributions
+------------
+If you encounter an issue with this gem, please report it in the issue tracker.
+
+Code contributions in the form of pull requests are always welcome, however **All contributions must include relevant test cases.**
