@@ -23,11 +23,15 @@ require 'stringio'
 
 module GEDCOM
   attr_accessor :auto_concat
+  ANY = [:any]
 
   class Parser
     def initialize(&block)
-      @before = {}
-      @after = {}
+      @callbacks = {
+        :before => Hash.new{|h,k| h[k] = []}, # Default to an empty array
+        :after  => Hash.new{|h,k| h[k] = []}  # Default to an empty array
+      }
+
       @context_stack = []
       @data_stack = []
       @current_level = -1
@@ -37,14 +41,16 @@ module GEDCOM
       instance_eval(&block) if block_given?
     end
 
-    def before(tag, proc=nil, &block)
-      proc = check_proc_or_block proc, &block
-      @before[[tag].flatten] = proc
+    def before(tags, callback=nil, &block)
+      tags = [tags].flatten
+      callback = check_proc_or_block(callback, &block)
+      @callbacks[:before][tags].push(callback)
     end
 
-    def after(tag, proc=nil, &block)
-      proc = check_proc_or_block proc, &block
-      @after[[tag].flatten] = proc
+    def after(tags, callback=nil, &block)
+      tags = [tags].flatten
+      callback = check_proc_or_block(callback, &block)
+      @callbacks[:after][tags].push(callback)
     end
 
     def parse(file)
@@ -78,7 +84,7 @@ module GEDCOM
     end
 
     def parse_file(file)
-      File.open( file, "r" ) do |io|
+      File.open(file) do |io|
         parse_io(io)
       end
     end
@@ -88,8 +94,7 @@ module GEDCOM
     end
 
     def parse_io(io)
-      rs = detect_rs(io)
-      io.each_line(rs) do |line|
+      io.each_line do |line|
         level, tag, rest = line.chop.split( ' ', 3 )
         next if level.nil? or tag.nil?
         level = level.to_i
@@ -99,22 +104,22 @@ module GEDCOM
           next
         end
 
-        unwind_to level
+        unwind_to(level)
 
         tag, rest = rest, tag if tag =~ /@.*@/
 
-        @context_stack.push tag
-        @data_stack.push rest
+        @context_stack.push(tag)
+        @data_stack.push(rest)
         @current_level = level
 
-        do_before @context_stack, rest
+        do_callbacks(:before, @context_stack, rest)
       end
       unwind_to -1
     end
 
     def unwind_to(level)
       while @current_level >= level
-        do_after @context_stack, @data_stack.last
+        do_callbacks(:after, @context_stack, @data_stack.last)
         @context_stack.pop
         @data_stack.pop
         @current_level -= 1
@@ -138,51 +143,12 @@ module GEDCOM
       end
     end
 
-    def do_before(tag, data)
-      if proc = @before[tag]
-        proc.call data
-      elsif proc = @before[ANY]
-        proc.call tag, data
+    def do_callbacks(context_sym, tags, data)
+      relevant_callbacks = @callbacks[context_sym][tags] + @callbacks[context_sym][ANY]
+      relevant_callbacks.each do |callback|
+        callback.call(data)
       end
     end
-
-    def do_after(tag, data)
-      if proc = @after[tag]
-        proc.call data
-      elsif proc = @after[ANY]
-        proc.call tag, data
-      end
-    end
-
-    ANY = [:any]
-
-    # valid gedcom may use either of \r or \r\n as the record separator.
-    # just in case, also detects simple \n as the separator as well
-    # detects the rs for this string by scanning ahead to the first occurence
-    # of either \r or \n, and checking the character after it
-    def detect_rs(io)
-      rs = "\x0d"
-      mark = io.pos
-      begin
-        while !io.eof && ch = io.readchar
-          case ch
-          when 0x0d
-            ch2 = io.readchar
-            if ch2 == 0x0a
-              rs = "\x0d\x0a"
-            end
-            break
-          when 0x0a
-            rs = "\x0a"
-            break
-          end
-        end
-      ensure
-        io.pos = mark
-      end
-      rs
-    end
-
   end #/ Parser
 
 end #/ GEDCOM

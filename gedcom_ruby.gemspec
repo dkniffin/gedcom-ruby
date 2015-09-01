@@ -11,4 +11,5 @@ Gem::Specification.new do |s|
   s.license     = 'GNU LESSER GENERAL PUBLIC LICENSE'
 
   s.add_development_dependency "rspec", "~> 3.2.0"
+  s.add_development_dependency "byebug"
 end
