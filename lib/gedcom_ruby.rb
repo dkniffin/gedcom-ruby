@@ -24,9 +24,6 @@ require 'stringio'
 module GEDCOM
   attr_accessor :auto_concat
 
-  # Possibly a better way to do this?
-  VERSION = "0.2.1"
-
   class Parser
     def initialize(&block)
       @before = {}
