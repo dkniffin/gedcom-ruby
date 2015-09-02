@@ -3,4 +3,5 @@
 2 CONC dle of a word. The resulting data object (string) should not include th
 2 CONC at newline, but instead should just concatenate the two pie
 2 CONC ces of the word together. It should also correctly handle breaks
-2 CONC  on spaces.
+2 CONC  on spaces. It should also handle blank lines.
+2 CONC

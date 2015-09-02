@@ -45,7 +45,7 @@ describe Parser do
       "the middle of a word. The resulting data object (string) should " +
       "not include that newline, but instead should just concatenate the " +
       "two pieces of the word together. It should also correctly handle " +
-      "breaks on spaces."
+      "breaks on spaces. It should also handle blank lines."
     end
     it "handles CONC correctly" do
       # Continue the text, with no newline or space in between
