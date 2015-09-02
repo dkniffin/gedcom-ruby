@@ -31,8 +31,8 @@ module GEDCOM
 
     def initialize(&block)
       @callbacks = {
-        :before => Hash.new{|h,k| h[k] = []}, # Default to an empty array
-        :after  => Hash.new{|h,k| h[k] = []}  # Default to an empty array
+        :before => {},
+        :after  => {}
       }
 
       @context_stack = []
@@ -42,17 +42,27 @@ module GEDCOM
       @auto_concat = true
 
       instance_eval(&block) if block_given?
+
+      after_initialize
+    end
+
+    def after_initialize
+      # Template
     end
 
     def before(tags, callback=nil, &block)
       tags = [tags].flatten
       callback = check_proc_or_block(callback, &block)
+
+      @callbacks[:before][tags] = default_empty(@callbacks[:before][tags])
       @callbacks[:before][tags].push(callback)
     end
 
     def after(tags, callback=nil, &block)
       tags = [tags].flatten
       callback = check_proc_or_block(callback, &block)
+
+      @callbacks[:after][tags] = default_empty(@callbacks[:after][tags])
       @callbacks[:after][tags].push(callback)
     end
 
@@ -77,6 +87,10 @@ module GEDCOM
 
 
     protected
+
+    def default_empty(arr)
+      arr || []
+    end
 
     def check_proc_or_block(proc, &block)
       unless proc or block_given?
@@ -140,7 +154,9 @@ module GEDCOM
     end
 
     def do_callbacks(context_sym, tags, data)
-      relevant_callbacks = @callbacks[context_sym][tags] + @callbacks[context_sym][ANY]
+      tag_cbs = default_empty(@callbacks[context_sym][tags])
+      any_cbs = default_empty(@callbacks[context_sym][ANY])
+      relevant_callbacks = tag_cbs + any_cbs
       relevant_callbacks.each do |callback|
         callback.call(data)
       end
