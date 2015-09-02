@@ -5,16 +5,7 @@ describe Parser do
   let(:parser) { GEDCOM::Parser.new }
   let(:tag_count) { {:all => 0} }
 
-  let(:harmless_cb_lambda) { lambda{|data| 1 + 1} }
-
-  before(:each) do
-    parser.before :any do |data|
-      tag = parser.context.join('_')
-      tag_count[tag] ||= 0
-      tag_count[tag] += 1
-      tag_count[:all] += 1
-    end
-  end
+  let(:callback) { lambda{|data| } }
 
   describe ".new" do
     it "can be called with block" do
@@ -28,17 +19,31 @@ describe Parser do
 
   describe "#before" do
     it "adds a callback to the :before stack" do
-      parser.before(:any, &harmless_cb_lambda)
-      expect(parser.callbacks[:before]).to include(&harmless_cb_lambda)
+      parser.before(:any, callback)
+      expect(parser.callbacks[:before].values.flatten).to include(callback)
+    end
+    describe ":any" do
+      it "is called for each line" do
+        parser.before(:any, callback)
+        expect(callback).to receive(:call).exactly(5).times
+        parser.parse "#{GEDCOMS}/5_lines.ged"
+      end
     end
   end
 
   describe "#after" do
     it "adds a callback to the :before stack" do
-      parser.after(:any, &harmless_cb_lambda)
-      expect(parser.callbacks[:after]).to include(&harmless_cb_lambda)
+      parser.after(:any, callback)
+      expect(parser.callbacks[:after].values.flatten).to include(callback)
     end
 
+    describe ":any" do
+      it "is called for each line" do
+        parser.after(:any, callback)
+        expect(callback).to receive(:call).exactly(5).times
+        parser.parse "#{GEDCOMS}/5_lines.ged"
+      end
+    end
 
     let(:correct_conc) do
       "This is a really long body of text that should be wrapped in " +
@@ -74,42 +79,36 @@ describe Parser do
   end
 
   describe "#parse" do
-    it "can count individual tags, before and after" do
-      count_before = 0
-      count_after = 0
-      parser.before 'INDI' do |data|
-        count_before += 1
-      end
-      parser.after 'INDI' do |data|
-        count_after += 1
-      end
-      parser.parse SIMPLE
-      expect(count_before).to eq(3)
-      expect(count_after).to eq(3)
+    it "can count tags, using before" do
+      parser.before(['INDI'], callback)
+      expect(callback).to receive(:call).exactly(3).times
+      parser.parse "#{GEDCOMS}/3_indis.ged"
     end
+
+    it "can count tags, using after" do
+      parser.after(['INDI'], callback)
+      expect(callback).to receive(:call).exactly(3).times
+      parser.parse "#{GEDCOMS}/3_indis.ged"
+    end
+
 
     it "unwinds all the way" do
       # TRLR indicates the end of a gedcom file
-      after_trlr = false
-      parser.after 'TRLR' do
-        after_trlr = true
-      end
+      parser.after('TRLR', callback)
+      expect(callback).to receive(:call).once
       parser.parse SIMPLE
-      expect(after_trlr).to eq(true)
-    end
-
-
-    it "uses :any as default" do
-      parser.parse SIMPLE
-      expect(tag_count[:all]).to eq(47)
-      expect(tag_count['INDI']).to eq(3)
-      expect(tag_count['FAM']).to eq(1)
-      expect(tag_count['FAM_MARR_DATE']).to eq(1)
     end
 
     it "handles empty gedcom" do
+      parser.before(:any, callback)
       parser.parse "\n"
-      expect(tag_count[:all]).to eq(0)
+      expect(callback).to_not receive(:call)
+    end
+
+    it "handles windows line endings" do
+      parser.before(['INDI'],callback)
+      expect(callback).to receive(:call).with('@I1@')
+      parser.parse "0 @I1@ INDI\r\n"
     end
   end
 end

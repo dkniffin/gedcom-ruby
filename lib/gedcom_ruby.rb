@@ -112,7 +112,8 @@ module GEDCOM
 
     def parse_io(io)
       io.each_line do |line|
-        next if line.chomp.empty?
+        line = line.rstrip!
+        next if line.empty?
         level, tag, rest = line.match(/^(\d) (\S+) ?(.*)$/).captures
         level = level.to_i
 
@@ -154,6 +155,7 @@ module GEDCOM
     end
 
     def do_callbacks(context_sym, tags, data)
+      return if tags == []
       tag_cbs = default_empty(@callbacks[context_sym][tags])
       any_cbs = default_empty(@callbacks[context_sym][ANY])
       relevant_callbacks = tag_cbs + any_cbs
