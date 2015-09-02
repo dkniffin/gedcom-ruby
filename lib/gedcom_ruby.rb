@@ -20,7 +20,7 @@
 #require '_gedcom'
 require 'gedcom_ruby/date'
 require 'stringio'
-# require 'byebug'
+require 'byebug'
 
 module GEDCOM
 
@@ -98,8 +98,8 @@ module GEDCOM
 
     def parse_io(io)
       io.each_line do |line|
-        level, tag, rest = line.chop.split(' ', 3)
-        next if level.nil? or tag.nil?
+        next if line.chomp.empty?
+        level, tag, rest = line.match(/^(\d) (\S+) ?(.*)$/).captures
         level = level.to_i
 
         if (tag == 'CONT' || tag == 'CONC') and @auto_concat
@@ -135,7 +135,7 @@ module GEDCOM
       when @data_stack.last.empty?       then rest
       when @context_stack.last == 'BLOB' then "#{@data_stack.last}#{rest}"
       when tag == 'CONT'                 then "#{@data_stack.last}\n#{rest}"
-      when tag == 'CONC'                 then "#{@data_stack.last.chomp}#{rest}"
+      when tag == 'CONC'                 then "#{@data_stack.last}#{rest}"
       end
     end
 

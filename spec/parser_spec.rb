@@ -5,7 +5,7 @@ describe Parser do
   let(:parser) { GEDCOM::Parser.new }
   let(:tag_count) { {:all => 0} }
 
-  let(:cb_lambda) { lambda{|data| 1 + 1} }
+  let(:harmless_cb_lambda) { lambda{|data| 1 + 1} }
 
   before(:each) do
     parser.before :any do |data|
@@ -27,25 +27,49 @@ describe Parser do
 
 
   describe "#before" do
-    before { parser.before(:any, &cb_lambda) }
-
     it "adds a callback to the :before stack" do
-      expect(parser.callbacks[:before]).to include(&cb_lambda)
+      parser.before(:any, &harmless_cb_lambda)
+      expect(parser.callbacks[:before]).to include(&harmless_cb_lambda)
     end
   end
 
   describe "#after" do
-    before { parser.after(:any, &cb_lambda) }
-
     it "adds a callback to the :before stack" do
-      expect(parser.callbacks[:after]).to include(&cb_lambda)
+      parser.after(:any, &harmless_cb_lambda)
+      expect(parser.callbacks[:after]).to include(&harmless_cb_lambda)
     end
 
-    it "auto-concatenates text" do
-      parser.after ['SUBM', 'ADDR'] do |text|
-        expect(text).to eq("Submitters address\naddress continued here")
+
+    let(:correct_conc) do
+      "This is a really long body of text that should be wrapped in " +
+      "the middle of a word. The resulting data object (string) should " +
+      "not include that newline, but instead should just concatenate the " +
+      "two pieces of the word together. It should also correctly handle " +
+      "breaks on spaces."
+    end
+    it "handles CONC correctly" do
+      # Continue the text, with no newline or space in between
+      parser.after ['SUBM', 'TEXT'] do |text|
+        expect(text).to eq(correct_conc)
       end
-      parser.parse SIMPLE
+
+      parser.parse "#{GEDCOMS}/linewrap_conc.ged"
+    end
+
+
+    let(:correct_cont) do
+      "This is a formatted attribute\n" +
+      "with a line break in the middle.\n" +
+      "Unlike CONC, the resulting string\n" +
+      "should have newline characters."
+    end
+    it "handles CONT correctly" do
+      # Continue the text, with a newline in the middle
+
+      parser.after ['SUBM', 'TEXT'] do |text|
+        expect(text).to eq(correct_cont)
+      end
+      parser.parse "#{GEDCOMS}/linewrap_cont.ged"
     end
   end
 

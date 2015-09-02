@@ -1,0 +1,5 @@
+0 @SUBMITTER@ SUBM
+1 TEXT This is a formatted attribute
+2 CONT with a line break in the middle.
+2 CONT Unlike CONC, the resulting string
+2 CONT should have newline characters.
