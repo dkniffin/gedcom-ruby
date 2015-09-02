@@ -40,6 +40,13 @@ describe Parser do
     it "adds a callback to the :before stack" do
       expect(parser.callbacks[:after]).to include(&cb_lambda)
     end
+
+    it "auto-concatenates text" do
+      parser.after ['SUBM', 'ADDR'] do |text|
+        expect(text).to eq("Submitters address\naddress continued here")
+      end
+      parser.parse SIMPLE
+    end
   end
 
   describe "#parse" do
@@ -56,34 +63,32 @@ describe Parser do
       expect(count_before).to eq(3)
       expect(count_after).to eq(3)
     end
-  end
 
-  it "auto-concatenates text" do
-    parser.after %w(SUBM NAME ADDR) do |text|
-      expect(text).to eq("Submitters address\naddress continued here")
+    it "unwinds all the way" do
+      after_trlr = false
+      parser.after 'TRLR' do
+        after_trlr = true
+      end
+      parser.parse SIMPLE
+      expect(after_trlr).to eq(true)
+    end
+
+
+    it "uses :any as default" do
+      parser.parse SIMPLE
+      expect(tag_count[:all]).to eq(47)
+      expect(tag_count['INDI']).to eq(3)
+      expect(tag_count['FAM']).to eq(1)
+      expect(tag_count['FAM_MARR_DATE']).to eq(1)
+    end
+
+    it "handles empty gedcom" do
+      parser.parse "\n"
+      expect(tag_count[:all]).to eq(0)
     end
   end
 
-  it "unwinds all the way" do
-    after_trlr = false
-    parser.after 'TRLR' do
-      after_trlr = true
-    end
-    parser.parse SIMPLE
-    expect(after_trlr).to eq(true)
-  end
 
 
-  it "uses :any as default" do
-    parser.parse SIMPLE
-    expect(tag_count[:all]).to eq(47)
-    expect(tag_count['INDI']).to eq(3)
-    expect(tag_count['FAM']).to eq(1)
-    expect(tag_count['FAM_MARR_DATE']).to eq(1)
-  end
 
-  it "handles empty gedcom" do
-    parser.parse "\n"
-    expect(tag_count[:all]).to eq(0)
-  end
 end
