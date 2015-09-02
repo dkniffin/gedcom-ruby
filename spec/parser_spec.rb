@@ -89,6 +89,7 @@ describe Parser do
     end
 
     it "unwinds all the way" do
+      # TRLR indicates the end of a gedcom file
       after_trlr = false
       parser.after 'TRLR' do
         after_trlr = true
@@ -111,8 +112,4 @@ describe Parser do
       expect(tag_count[:all]).to eq(0)
     end
   end
-
-
-
-
 end
