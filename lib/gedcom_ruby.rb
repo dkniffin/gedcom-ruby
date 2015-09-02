@@ -20,13 +20,15 @@
 #require '_gedcom'
 require 'gedcom_ruby/date'
 require 'stringio'
+# require 'byebug'
 
 module GEDCOM
-  attr_accessor :auto_concat
-  attr_reader :callbacks
-  ANY = [:any]
 
   class Parser
+    attr_accessor :auto_concat
+    attr_reader :callbacks
+    ANY = [:any]
+
     def initialize(&block)
       @callbacks = {
         :before => Hash.new{|h,k| h[k] = []}, # Default to an empty array
@@ -96,12 +98,12 @@ module GEDCOM
 
     def parse_io(io)
       io.each_line do |line|
-        level, tag, rest = line.chop.split( ' ', 3 )
+        level, tag, rest = line.chop.split(' ', 3)
         next if level.nil? or tag.nil?
         level = level.to_i
 
         if (tag == 'CONT' || tag == 'CONC') and @auto_concat
-          concat_data tag, rest
+          concat_data(tag, rest)
           next
         end
 
@@ -115,7 +117,7 @@ module GEDCOM
 
         do_callbacks(:before, @context_stack, rest)
       end
-      unwind_to -1
+      unwind_to(-1)
     end
 
     def unwind_to(level)
@@ -128,19 +130,12 @@ module GEDCOM
     end
 
     def concat_data(tag, rest)
-      if @data_stack[-1].nil?
-        @data_stack[-1] = rest
-      else
-        if @context_stack[-1] == 'BLOB'
-          @data_stack[-1] << rest
-        else
-          if tag == 'CONT'
-            @data_stack[-1] << "\n" + (rest || "")
-          elsif tag == 'CONC'
-            old = @data_stack[-1].chomp
-            @data_stack[-1] = old + (rest || "")
-          end
-        end
+      rest = rest || "" # Handle nil case
+      @data_stack[-1] = case
+      when @data_stack.last.empty?       then rest
+      when @context_stack.last == 'BLOB' then "#{@data_stack.last}#{rest}"
+      when tag == 'CONT'                 then "#{@data_stack.last}\n#{rest}"
+      when tag == 'CONC'                 then "#{@data_stack.last.chomp}#{rest}"
       end
     end
 
