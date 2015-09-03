@@ -1,4 +1,0 @@
-#PCD -- Using "AD" as the epoch isn't allowed... is this correct
-# behavior? If BC isn't supplied, AD is assumed, but it seems to me it
-# should at least be allowed grammar
-
