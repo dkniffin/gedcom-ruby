@@ -4,7 +4,7 @@ Gem::Specification.new do |s|
   s.date        = '2015-08-31'
   s.summary     = "A Ruby library for easily doing custom, callback-based GEDCOM parsing"
   s.description = "This is a module for the Ruby language that defines a callback GEDCOM parser. It does not do any validation of a GEDCOM file, but, using application-defined callback hooks, can traverse any well-formed GEDCOM."
-  s.authors     = ["Derek Kniffin"]
+  s.authors     = ["Derek Kniffin", "Phillip Davies"]
   s.email       = 'derek.kniffin@gmail.com'
   s.files       = ["lib/gedcom_ruby.rb"]
   s.homepage    = 'https://github.com/dkniffin/gedcom-ruby'
