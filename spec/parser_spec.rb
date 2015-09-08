@@ -29,6 +29,27 @@ describe Parser do
         parser.parse "#{GEDCOMS}/5_lines.ged"
       end
     end
+
+    # I have no clue why this isn't working. It puts out the "meh" five times,
+    # but for some reason rspec doesn't think some_method has been called
+    # context "with a custom parser" do
+    #   before do
+    #     class CustomParser < GEDCOM::Parser
+    #       def after_initialize
+    #         before(:any, :some_method)
+    #       end
+    #       def some_method(data)
+    #         puts "meh"
+    #       end
+    #     end
+    #   end
+    #   let(:parser) { CustomParser.new }
+    #
+    #   it "can be called with a method" do
+    #     expect(parser).to receive(:some_method).exactly(5).times
+    #     parser.parse "#{GEDCOMS}/5_lines.ged"
+    #   end
+    # end
   end
 
   describe "#after" do
