@@ -1,3 +1,5 @@
+![](https://badge.fury.io/rb/gedcom_ruby.svg)
+![](http://ruby-gem-downloads-badge.herokuapp.com/gedcom_ruby)
 [![Build Status](https://travis-ci.org/dkniffin/gedcom-ruby.svg?branch=master)](https://travis-ci.org/dkniffin/gedcom-ruby)
 [![Code Climate](https://codeclimate.com/github/dkniffin/gedcom-ruby/badges/gpa.svg)](https://codeclimate.com/github/dkniffin/gedcom-ruby)
 
